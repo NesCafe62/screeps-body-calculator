@@ -79,7 +79,7 @@ function AppData() {
 
 	const getHealth = () => getPartsCount() * BODY_PART_HEALTH;
 
-	const bodyPartsOrder = ['Tough', 'Work', 'Carry', 'Attack', 'Ranged', 'Heal', 'Claim', 'Move'];
+	const bodyPartsOrder = ['Tough', 'Work', 'Carry', 'Ranged', 'Attack', 'Heal', 'Claim', 'Move'];
 	const getBodyParts = memo(() => {
 		const body = [];
 		for (const partType of bodyPartsOrder) {

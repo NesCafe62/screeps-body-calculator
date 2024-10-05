@@ -5,7 +5,8 @@ function BodyParts({ getBodyParts }) {
 		<div class="body-parts">
 			<Index each={getBodyParts} key="type">{ bodyPart => (
 				<div
-					class={'body-part' + (bodyPart.type ? ` body-part-${bodyPart.type.toLowerCase()}` : '')}
+					class="body-part"
+					style={bodyPart.type ? `background-color: var(--cl-part-${bodyPart.type.toLowerCase()});` : undefined}
 					title={bodyPart.type || undefined}
 				/>
 			)}</Index>
