@@ -14,7 +14,7 @@ button {
 
 :root {
 	--cl-part-move: #a9b7c6;
-	--cl-part-work: #ffe56d;
+	--cl-part-work: #ffe664;
 	--cl-part-carry: #777;
 	--cl-part-attack: #f93842;
 	--cl-part-ranged: #5d80b2;
@@ -142,7 +142,7 @@ main {
 	// background-color: rgba(48, 54, 68, 0.4);
 
 	&::before {
-		content: " ";
+		content: "";
 		display: block;
 		height: 40px;
 		margin-bottom: -40px;
@@ -416,6 +416,7 @@ main {
 	background-color: var(--cl-panel-bg);
 	border-radius: 12px;
 	padding: 20px 20px 20px 20px;
+	min-height: 582px;
 }
 
 .body-parts {
@@ -442,6 +443,10 @@ main {
 	margin-right: 7px;
 	margin-bottom: 7px;
 	background-color: rgba(169, 183, 198, 0.05);
+}
+
+.body-part-boosted {
+	outline: 2px solid white;
 }
 
 .body-part-move {
@@ -476,7 +481,50 @@ main {
 	background-color: var(--cl-part-tough);
 }
 
+.creep-total-parts-count {
+	display: block;
+	text-align: right;
+	padding: 5px 6px 5px 6px;
+	border-radius: 7px;
+	margin-top: -5px;
+	margin-bottom: -5px;
+	margin-right: -6px;
+	transition: background-color 0.3s ease, color 0.3s ease;
+
+	.mdi {
+		margin-right: 7px;
+		font-size: 1.3rem;
+		vertical-align: top;
+		line-height: 1rem;
+		position: relative;
+		top: 1px;
+		opacity: 0;
+		transition: opacity 0.3s ease;
+	}
+}
+
+.max-parts-count-warning {
+	color: #FF3F4B;
+	background-color: #771d2e40;
+
+	.mdi {
+		opacity: 0.8;
+	}
+}
 
 .creep-metric-row {
 	display: flex;
+}
+
+.creep-metric-group {
+	overflow: hidden;
+	transition: max-height 0.5s cubic-bezier(0, 1, 0, 1) 0.1s, opacity 0.2s ease-out;
+	max-height: 0;
+	opacity: 0;
+}
+
+.creep-metric-group-visible {
+	transition: max-height 1s ease-in-out, opacity 0.2s ease-out 0.2s;
+	max-height: 1000px;
+	opacity: 1;
 }

@@ -23,6 +23,17 @@ const DAMAGE_RANGED = 10; // RMA 10/4/1
 const HEAL_ADJACENT = 12;
 const HEAL_RANGED = 4; // RMH 4
 
+const BodyPartsCost = {
+	Move: 50,
+	Work: 100,
+	Carry: 50,
+	Attack: 80,
+	Ranged: 150,
+	Heal: 250,
+	Tough: 10,
+	Claim: 600,
+};
+
 function AppData() {
 
 	function bodyPartData(data = {}) {
@@ -43,10 +54,18 @@ function AppData() {
 		Tough: bodyPartData({ count: 0, boost: '' }),
 	};
 
-	const getPartsCount = memo(() => {
+	const partsCount = memo(() => {
 		let count = 0;
 		for (const partType in bodyParts) {
 			count += bodyParts[partType].count;
+		}
+		return count;
+	}, {static: true});
+
+	const cost = memo(() => {
+		let count = 0;
+		for (const partType in bodyParts) {
+			count += BodyPartsCost[partType] * bodyParts[partType].count;
 		}
 		return count;
 	}, {static: true});
@@ -56,6 +75,9 @@ function AppData() {
 		movePlain: () => '1' + '&#x2044;' + '2',
 		moveSwamp: () => '1' + '&#x2044;' + '10',
 
+		partsCount,
+		cost,
+		health: () => partsCount() * BODY_PART_HEALTH,
 		capacity: () => bodyParts.Carry.count * CARRY_CAPACITY,
 
 		upgrade: () => bodyParts.Work.count * WORK_UPGRADE_ENERGY,
@@ -77,8 +99,6 @@ function AppData() {
 		healRanged: () => bodyParts.Heal.count * HEAL_RANGED,
 	};
 
-	const getHealth = () => getPartsCount() * BODY_PART_HEALTH;
-
 	const bodyPartsOrder = ['Tough', 'Work', 'Carry', 'Ranged', 'Attack', 'Heal', 'Claim', 'Move'];
 	const getBodyParts = memo(() => {
 		const body = [];
@@ -86,7 +106,7 @@ function AppData() {
 			const partsCount = bodyParts[partType].count;
 			const boost = bodyParts[partType].boost;
 			for (let i = 0; i < partsCount; i++) {
-				body.push({ type: partType, boost });
+				body.push({ type: partType, boost, key: `${partType}:${boost}` });
 				if (body.length >= 50) {
 					break;
 				}
@@ -96,7 +116,7 @@ function AppData() {
 			}
 		}
 		for (let i = body.length; i < 50; i++) {
-			body.push({ type: '', boost: undefined });
+			body.push({ type: '', boost: '', key: '' });
 		}
 		return body;
 	}, {static: true});
@@ -112,8 +132,8 @@ function AppData() {
 	}
 
 	return {
-		bodyParts, getPartsCount, stats,
-		getHealth, getBodyParts, clear,
+		bodyParts, stats,
+		getBodyParts, clear,
 	};
 }
 
@@ -121,8 +141,8 @@ function App() {
 	document.getElementById('app').style.opacity = '';
 
 	const {
-		bodyParts, getPartsCount, stats,
-		getHealth, getBodyParts, clear,
+		bodyParts, stats,
+		getBodyParts, clear,
 	} = AppData();
 
 	render(PanelCreepPreview, document.getElementById('panel-creep-preview'), { bodyParts });
@@ -132,7 +152,7 @@ function App() {
 	});
 
 	render(PanelBodyParts, document.getElementById('panel-body-parts'), {
-		bodyParts, getPartsCount, getHealth, getBodyParts, stats
+		bodyParts, getBodyParts, stats
 	});
 }
 

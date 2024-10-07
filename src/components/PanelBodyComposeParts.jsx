@@ -43,7 +43,7 @@ const Boosts = {
 	],
 	Ranged: [
 		// violet
-		{tier: 'T3', title: 'KH', color: 'mineral-k'},
+		{tier: 'T3', title: 'KO', color: 'mineral-k'},
 		{tier: 'T2', title: 'KHO2', color: 'mineral-k'},
 		{tier: 'T1', title: 'XKHO2', color: 'mineral-k'},
 	],
