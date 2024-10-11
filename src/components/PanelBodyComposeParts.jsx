@@ -11,8 +11,8 @@ const Boosts = {
 	Work: [
 		// harvest: teal
 		{tier: 'T3', title: 'UO', color: 'mineral-u'},
-		{tier: 'T2', title: 'UH2O', color: 'mineral-u'},
-		{tier: 'T1', title: 'XUH2O', color: 'mineral-u'},
+		{tier: 'T2', title: 'UHO2', color: 'mineral-u'},
+		{tier: 'T1', title: 'XUHO2', color: 'mineral-u'},
 
 		// upgrade: white
 		{tier: 'T3', title: 'GH', color: 'mineral-g'},

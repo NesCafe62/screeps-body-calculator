@@ -27,12 +27,47 @@ function PanelBodyParts({ bodyParts, getBodyParts, stats }) {
 			? 'Creep size exceeds the maximum of 50 parts'
 			: ''
 	), {static: true});
+
+	function getMoveSpeed(moveTicks) {
+		if (moveTicks > 1) {
+			return '1' + '&#x2044;' + moveTicks;
+		}
+		return moveTicks;
+	}
+
+	function getMoveSpeedColor(moveTicks) {
+		if (moveTicks === 0 || moveTicks >= 5) {
+			return 'red';
+		}
+		if (moveTicks >= 3) {
+			return 'orange';
+		}
+		if (moveTicks >= 2) {
+			return 'yellow';
+		}
+		return 'green';
+	}
+
+	let prevHealthByTough = 0;
+	function getHealthByTough() {
+		const healthByTough = stats.healthByTough();
+		if (healthByTough > 0) {
+			prevHealthByTough = healthByTough;
+		}
+		return '(' + prevHealthByTough + ')';
+	}
+
 	return (
 		<div id="panel-body-parts">
 			<div class="creep-metric-row" style="margin-bottom: 20px">
-				<span title="Creep health" style="display: block;">
+				<span title="Creep effective health" style="display: block;">
 					<i class="mdi mdi-heart" style="font-size: 1.1rem;vertical-align: top;line-height: 1rem;margin-right: 5px;" />{stats.health}
 				</span>
+				<span
+					class="creep-metric-health-by-tough"
+					classList={{ 'creep-metric-visible': () => stats.healthByTough() > 0 }}
+					title={() => (stats.healthByTough() > 0) ? 'Health by tough' : undefined}
+				>{() => getHealthByTough()}</span>
 				<span style="display: block;flex-grow: 1;" />
 				<span
 					class="creep-total-parts-count"
@@ -53,35 +88,101 @@ function PanelBodyParts({ bodyParts, getBodyParts, stats }) {
 					<span style="font-size: 0.8rem;min-width: 45px;display: inline-block;text-align: left;">EN</span>
 				</span>
 			</div>
-			<div class="creep-metric-row" style="margin-top: 20px;">
+			<div class="creep-metric-row" style="margin-top: 20px;" title="Move speed on road">
 				<span style="display: inline-block;">
 					<i class="mdi mdi-road-variant" style="font-size: 1.3rem;vertical-align: top;line-height: 1rem;margin-right: 8px;" />
 					<span style="display: inline-block;">Road</span>
 				</span>
 				<span style="text-align: right;display: inline-block;flex-grow: 1;margin-right: -10px;">
-					<span style="font-size: 1.3rem;vertical-align: top;display: inline-block;padding-right: 8px;line-height: 1rem;color: #65FD62;" innerHTML={stats.moveRoad}></span>
+					<span
+						class={() => 'creep-metric-move-cl-' + getMoveSpeedColor(stats.moveRoad())}
+						style="font-size: 1.3rem;vertical-align: top;display: inline-block;padding-right: 8px;line-height: 1rem;"
+						innerHTML={() => getMoveSpeed(stats.moveRoad())}
+					/>
 					<span style="font-size: 0.8rem;min-width: 45px;display: inline-block;text-align: left;" innerHTML={'tile &#x2044; t'} />
 				</span>
 			</div>
-			<div class="creep-metric-row" style="margin-top: 15px;">
+			<div
+				class="creep-metric-group"
+				classList={{ 'creep-metric-group-visible': () => bodyParts.Carry.count > 0 }}
+			>
+				<div class="creep-metric-row" style="margin-top: 10px;">
+					<span style="display: inline-block;">
+						<span style="width: 109px;display: inline-block;padding-left: 30px;">full</span>
+					</span>
+					<span style="text-align: right;display: inline-block;flex-grow: 1;margin-right: -10px;">
+						<span
+							class={() => 'creep-metric-move-cl-' + getMoveSpeedColor(stats.moveRoadFull())}
+							style="font-size: 1.3rem;vertical-align: top;display: inline-block;padding-right: 8px;line-height: 1rem;"
+							innerHTML={() => getMoveSpeed(stats.moveRoadFull())}
+						/>
+						<span style="font-size: 0.8rem;min-width: 45px;display: inline-block;text-align: left;" innerHTML={'tile &#x2044; t'} />
+					</span>
+				</div>
+			</div>
+			<div class="creep-metric-row" style="margin-top: 15px;" title="Move speed on plain">
 				<span style="display: inline-block;">
 					<i class="mdi mdi-grass" style="font-size: 1.3rem;vertical-align: top;line-height: 1rem;margin-right: 8px;" />
 					<span style="display: inline-block;">Plain</span>
 				</span>
 				<span style="text-align: right;display: inline-block;flex-grow: 1;margin-right: -10px;">
-					<span style="font-size: 1.3rem;vertical-align: top;display: inline-block;padding-right: 8px;line-height: 1rem;color: #F9B738;" innerHTML={stats.movePlain} />
+					<span
+						class={() => 'creep-metric-move-cl-' + getMoveSpeedColor(stats.movePlain())}
+						style="font-size: 1.3rem;vertical-align: top;display: inline-block;padding-right: 8px;line-height: 1rem;"
+						innerHTML={() => getMoveSpeed(stats.movePlain())}
+					/>
 					<span style="font-size: 0.8rem;min-width: 45px;display: inline-block;text-align: left;" innerHTML={'tile &#x2044; t'} />
 				</span>
 			</div>
-			<div class="creep-metric-row" style="margin-top: 15px;">
+			<div
+				class="creep-metric-group"
+				classList={{ 'creep-metric-group-visible': () => bodyParts.Carry.count > 0 }}
+			>
+				<div class="creep-metric-row" style="margin-top: 10px;">
+					<span style="display: inline-block;">
+						<span style="width: 109px;display: inline-block;padding-left: 30px;">full</span>
+					</span>
+					<span style="text-align: right;display: inline-block;flex-grow: 1;margin-right: -10px;">
+						<span
+							class={() => 'creep-metric-move-cl-' + getMoveSpeedColor(stats.movePlainFull())}
+							style="font-size: 1.3rem;vertical-align: top;display: inline-block;padding-right: 8px;line-height: 1rem;"
+							innerHTML={() => getMoveSpeed(stats.movePlainFull())}
+						/>
+						<span style="font-size: 0.8rem;min-width: 45px;display: inline-block;text-align: left;" innerHTML={'tile &#x2044; t'} />
+					</span>
+				</div>
+			</div>
+			<div class="creep-metric-row" style="margin-top: 15px;" title="Move speed on swamp">
 				<span style="display: inline-block;">
 					<i class="mdi mdi-water" style="font-size: 1.3rem;vertical-align: top;line-height: 1rem;margin-right: 8px;" />
 					<span style="display: inline-block;">Swamp</span>
 				</span>
 				<span style="text-align: right;display: inline-block;flex-grow: 1;margin-right: -10px;">
-					<span style="font-size: 1.3rem;vertical-align: top;display: inline-block;padding-right: 8px;line-height: 1rem;color: #F93842;" innerHTML={stats.moveSwamp} />
+					<span
+						class={() => 'creep-metric-move-cl-' + getMoveSpeedColor(stats.moveSwamp())}
+						style="font-size: 1.3rem;vertical-align: top;display: inline-block;padding-right: 8px;line-height: 1rem;"
+						innerHTML={() => getMoveSpeed(stats.moveSwamp())}
+					/>
 					<span style="font-size: 0.8rem;min-width: 45px;display: inline-block;text-align: left;" innerHTML={'tile &#x2044; t'} />
 				</span>
+			</div>
+			<div
+				class="creep-metric-group"
+				classList={{ 'creep-metric-group-visible': () => bodyParts.Carry.count > 0 }}
+			>
+				<div class="creep-metric-row" style="margin-top: 10px;">
+					<span style="display: inline-block;">
+						<span style="width: 109px;display: inline-block;padding-left: 30px;">full</span>
+					</span>
+					<span style="text-align: right;display: inline-block;flex-grow: 1;margin-right: -10px;">
+						<span
+							class={() => 'creep-metric-move-cl-' + getMoveSpeedColor(stats.moveSwampFull())}
+							style="font-size: 1.3rem;vertical-align: top;display: inline-block;padding-right: 8px;line-height: 1rem;"
+							innerHTML={() => getMoveSpeed(stats.moveSwampFull())}
+						/>
+						<span style="font-size: 0.8rem;min-width: 45px;display: inline-block;text-align: left;" innerHTML={'tile &#x2044; t'} />
+					</span>
+				</div>
 			</div>
 
 			<div class="creep-metric-row" style="margin-top: 15px;">
@@ -91,7 +192,7 @@ function PanelBodyParts({ bodyParts, getBodyParts, stats }) {
 				</span>
 				<span style="text-align: right;display: inline-block;flex-grow: 1;margin-right: -10px;">
 					<span style="font-size: 1.3rem;vertical-align: top;display: inline-block;padding-right: 8px;line-height: 1rem;">{stats.capacity}</span>
-					<span style="font-size: 0.8rem;min-width: 45px;display: inline-block;text-align: left;"></span>
+					<span style="font-size: 0.8rem;min-width: 45px;display: inline-block;text-align: left;" />
 				</span>
 			</div>
 
@@ -114,9 +215,9 @@ function PanelBodyParts({ bodyParts, getBodyParts, stats }) {
 						<i class="mdi mdi-hexagon-slice-1" style="font-size: 1.3rem;vertical-align: top;line-height: 1rem;margin-right: 8px;" />
 						<span style="display: inline-block;">Upgrade</span>
 					</span>
-					<span style="text-align: right;display: inline-block;flex-grow: 1;margin-right: -10px;">
+					<span style="text-align: right;display: inline-block;flex-grow: 1;margin-right: -10px;" title="Progress points per tick">
 						<span style="font-size: 1.3rem;vertical-align: top;display: inline-block;padding-right: 8px;line-height: 1rem;">{stats.upgrade}</span>
-						<span style="font-size: 0.8rem;min-width: 45px;display: inline-block;text-align: left;" innerHTML={'EN &#x2044; t'} />
+						<span style="font-size: 0.8rem;min-width: 45px;display: inline-block;text-align: left;" innerHTML={'PT &#x2044; t'} />
 					</span>
 				</div>
 				<div class="creep-metric-row" style="margin-top: 15px;">
@@ -133,9 +234,9 @@ function PanelBodyParts({ bodyParts, getBodyParts, stats }) {
 					<span style="display: inline-block;">
 						<span style="width: 109px;display: inline-block;"></span>
 					</span>
-					<span style="text-align: right;display: inline-block;flex-grow: 1;margin-right: -10px;">
-						<span style="font-size: 1.3rem;vertical-align: top;display: inline-block;padding-right: 8px;line-height: 1rem;">{stats.buildHp}</span>
-						<span style="font-size: 0.8rem;min-width: 45px;display: inline-block;text-align: left;" innerHTML={'HP &#x2044; t'} />
+					<span style="text-align: right;display: inline-block;flex-grow: 1;margin-right: -10px;" title="Progress points per tick">
+						<span style="font-size: 1.3rem;vertical-align: top;display: inline-block;padding-right: 8px;line-height: 1rem;">{stats.buildProgress}</span>
+						<span style="font-size: 0.8rem;min-width: 45px;display: inline-block;text-align: left;" innerHTML={'PT &#x2044; t'} />
 					</span>
 				</div>
 				<div class="creep-metric-row" style="margin-top: 15px;">

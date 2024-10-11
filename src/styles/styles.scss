@@ -516,6 +516,40 @@ main {
 	display: flex;
 }
 
+.creep-metric-health-by-tough {
+	display: block;
+	margin-left: 6px;
+	opacity: 0;
+	transition: opacity 0.3s ease;
+}
+
+.creep-metric-visible {
+	opacity: 1;
+}
+
+.creep-metric-move-cl-green {
+	color: #65FD62;
+}
+
+.creep-metric-move-cl-yellow {
+	color: #F9B738;
+}
+
+.creep-metric-move-cl-orange {
+	color: #FF6233;
+}
+
+.creep-metric-move-cl-red {
+	color: #F93842;
+}
+
+/* .creep-metric-move-cl-infinity {
+	color: #F93842;
+	font-size: 1.8rem !important;
+	position: relative;
+	top: 3px;
+} */
+
 .creep-metric-group {
 	overflow: hidden;
 	transition: max-height 0.5s cubic-bezier(0, 1, 0, 1) 0.1s, opacity 0.2s ease-out;
