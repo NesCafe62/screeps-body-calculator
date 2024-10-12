@@ -57,6 +57,14 @@ function PanelBodyParts({ bodyParts, getBodyParts, stats }) {
 		return '(' + prevHealthByTough + ')';
 	}
 
+	function labelRCL() {
+		const rcl = stats.minRCL();
+		if (rcl === null) {
+			return 'RCL <span style="font-size: 1.8rem;line-height: 1rem;vertical-align: top;position: relative;top: 1px;">&infin;</span>';
+		}
+		return `RCL ${rcl}`;
+	}
+
 	return (
 		<div id="panel-body-parts">
 			<div class="creep-metric-row" style="margin-bottom: 20px">
@@ -83,8 +91,24 @@ function PanelBodyParts({ bodyParts, getBodyParts, stats }) {
 					<i class="mdi mdi-lightning-bolt" style="font-size: 1.3rem;vertical-align: top;line-height: 1rem;margin-right: 8px;" />
 					<span style="display: inline-block;">Cost</span>
 				</span>
-				<span style="text-align: right;display: inline-block;flex-grow: 1;margin-right: -10px;">
+				<span
+					class="creep-metric-value-cost"
+					style="text-align: right;display: inline-block;flex-grow: 1;margin-right: -10px;"
+					title={() => (stats.cost() > stats.maxCost) ? 'Creep cost exceeds RCL8 energy capacity' : undefined}
+					classList={{ 'max-cost-warning': () => stats.cost() > stats.maxCost }}
+				>
 					<span style="font-size: 1.3rem;vertical-align: top;display: inline-block;padding-right: 8px;line-height: 1rem;">{stats.cost}</span>
+					<span style="font-size: 0.8rem;min-width: 45px;display: inline-block;text-align: left;">EN</span>
+				</span>
+			</div>
+			<div class="creep-metric-row" style="margin-top: 10px;">
+				<span style="display: inline-block;">
+					<span style="display: inline-block;padding-left: 30px;" innerHTML={labelRCL} />
+				</span>
+				<span style="text-align: right;display: inline-block;flex-grow: 1;margin-right: -10px;">
+					<span style="font-size: 1.3rem;vertical-align: top;display: inline-block;padding-right: 8px;line-height: 1rem;">
+						{() => stats.getEnergyCapacityAtRCL(stats.minRCL())}
+					</span>
 					<span style="font-size: 0.8rem;min-width: 45px;display: inline-block;text-align: left;">EN</span>
 				</span>
 			</div>

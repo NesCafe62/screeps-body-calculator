@@ -562,6 +562,14 @@ footer {
 	display: flex;
 }
 
+.creep-metric-value-cost {
+	transition: color 0.3s ease;
+}
+
+.max-cost-warning {
+	color: #FF3F4B;
+}
+
 .creep-metric-health-by-tough {
 	display: block;
 	margin-left: 6px;

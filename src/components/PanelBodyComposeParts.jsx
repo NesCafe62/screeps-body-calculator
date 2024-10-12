@@ -187,14 +187,14 @@ function PanelBodyComposeParts({ bodyParts, clear }) {
 					onClick={clear} onMouseDown={e => e.preventDefault()}
 				>Clear</button>
 			</div>
-			<BodyPartCompose label="Move" data={bodyParts.Move} />
-			<BodyPartCompose label="Work" data={bodyParts.Work} />
-			<BodyPartCompose label="Carry" data={bodyParts.Carry} />
-			<BodyPartCompose label="Attack" data={bodyParts.Attack} />
-			<BodyPartCompose label="Ranged" tooltip="Ranged Attack" data={bodyParts.Ranged} />
-			<BodyPartCompose label="Heal" data={bodyParts.Heal} />
-			<BodyPartCompose label="Tough" data={bodyParts.Tough} />
-			<BodyPartCompose label="Claim" data={bodyParts.Claim} />
+			<BodyPartCompose label="Move" tooltip="Move - 50 EN" data={bodyParts.Move} />
+			<BodyPartCompose label="Work" tooltip="Work - 100 EN" data={bodyParts.Work} />
+			<BodyPartCompose label="Carry" tooltip="Carry - 50 EN" data={bodyParts.Carry} />
+			<BodyPartCompose label="Attack" tooltip="Attack - 80 EN" data={bodyParts.Attack} />
+			<BodyPartCompose label="Ranged" tooltip="Ranged Attack - 150 EN" data={bodyParts.Ranged} />
+			<BodyPartCompose label="Heal" tooltip="Heal - 250 EN" data={bodyParts.Heal} />
+			<BodyPartCompose label="Tough" tooltip="Tough - 10 EN" data={bodyParts.Tough} />
+			<BodyPartCompose label="Claim" tooltip="Claim - 600 EN" data={bodyParts.Claim} />
 			<div class="body-compose-hint">
 				<span class="body-compose-hint-sign">±</span>
 				<span style="margin-right: 15px">5</span>Shift + <i class="mdi mdi-mouse" style="opacity: 0.5;" />

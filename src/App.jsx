@@ -25,6 +25,18 @@ const DAMAGE_RANGED = 10; // RMA 10/4/1
 const HEAL_ADJACENT = 12;
 const HEAL_RANGED = 4; // RMH 4
 
+const RCL_ENERGY_CAPACITY = {
+	1: 300, // 300
+	2: 550, // 50 * 5 + 300
+	3: 800, // 50 * 10 + 300
+	4: 1300, // 50 * 20 + 300
+	5: 1800, // 50 * 30 + 300
+	6: 2300, // 50 * 40 + 300
+	7: 5600, // 100 * 50 + 300 * 2
+	8: 12900, // 200 * 60 + 300 * 3
+};
+const CREEP_MAX_COST = RCL_ENERGY_CAPACITY[8];
+
 const BodyPartsCost = {
 	Move: 50,
 	Work: 100,
@@ -136,6 +148,16 @@ function AppData() {
 		return count;
 	}, {static: true});
 
+	function minRCL() {
+		const creepCost = cost();
+		for (const rcl in RCL_ENERGY_CAPACITY) {
+			if (creepCost <= RCL_ENERGY_CAPACITY[rcl]) {
+				return rcl;
+			}
+		}
+		return null;
+	}
+
 	function getMoveTicks(terrianCost, isFull) {
 		const moveParts = bodyParts.Move.count;
 		const boostMultiplier = BoostsEfficiency.Move[bodyParts.Move.boost];
@@ -171,6 +193,9 @@ function AppData() {
 
 		partsCount,
 		cost,
+		minRCL,
+		maxCost: CREEP_MAX_COST,
+		getEnergyCapacityAtRCL: (rcl) => RCL_ENERGY_CAPACITY[rcl || 8],
 		health,
 		healthByTough,
 		capacity: () => (
