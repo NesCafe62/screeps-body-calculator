@@ -22,6 +22,9 @@ button {
 	--cl-part-claim: #b99cfb;
 	--cl-part-tough: #fff;
 
+	--cl-move-preview: #718398;
+	--cl-tough-preview: #363840;
+
 	--cl-mineral-u: #50d7f9;
 	--cl-mineral-k: #a071ff;
 	--cl-mineral-l: #00f4a2;
@@ -52,9 +55,13 @@ body {
 
 #app {
 	transition: opacity 0.4s ease 0.2s;
+	height: 100%;
+	display: flex;
+	flex-direction: column;
 }
 
 .container {
+	width: 100%;
 	max-width: 1000px;
 	margin-left: auto;
 	margin-right: auto;
@@ -64,7 +71,7 @@ body {
 }
 
 header {
-	padding-top: 30px;
+	padding-top: 20px;
 	padding-bottom: 10px;
 	display: flex;
 }
@@ -94,9 +101,28 @@ h1 {
 }
 
 main {
-	padding-top: 40px;
-	padding-bottom: 60px;
+	padding-top: 20px;
+	padding-bottom: 30px;
 	display: flex;
+}
+
+footer {
+	padding-bottom: 20px;
+	display: flex;
+	width: 160px;
+	margin-left: auto;
+	margin-right: auto;
+}
+
+#pozitron-logo {
+	opacity: 0.6;
+	height: 36px;
+	transition: opacity 0.2s ease-out;
+	margin-top: 8px;
+
+	&:hover, &:focus, &:active {
+		opacity: 1;
+	}
 }
 
 #panel-body-compose {
@@ -105,6 +131,7 @@ main {
 	border-radius: 12px;
 	display: flex;
 	flex-grow: 1;
+	min-width: 570px;
 }
 
 #panel-creep-preview {
@@ -126,7 +153,26 @@ main {
 	position: absolute;
 	margin-left: 10px;
 	margin-top: 10px;
-	background-color: rgb(34, 34, 34);
+	background-color: rgb(33, 37, 47);
+}
+
+.creep-preview-tough {
+	width: 180px;
+	height: 180px;
+	border-radius: 100%;
+	position: absolute;
+	background-color: rgb(33, 37, 47);
+	box-shadow: 0 0 15px 12px rgba(0, 0, 0, 0.2);
+	margin-left: 10px;
+	margin-top: 10px;
+	transition: outline 0.2s ease, opacity 0.2s ease;
+	outline: 0 solid var(--cl-tough-preview);
+	opacity: 0;
+}
+
+.creep-preview-tough-visible {
+	outline: 12px solid var(--cl-tough-preview);
+	opacity: 1;
 }
 
 #panel-body-compose-parts {

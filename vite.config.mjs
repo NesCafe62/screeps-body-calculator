@@ -10,7 +10,7 @@ export default defineConfig({
 	},
 	build: {
 		minify: false,
-		polyfillModulePreload: false,
+		modulePreload: {polyfill: false},
 	},
 	resolve: {
 		alias: {

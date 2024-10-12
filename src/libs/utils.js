@@ -1,3 +1,5 @@
+import { $bindAttr } from "pozitron-js/render";
+
 export function delegateEvent(containerEl, selector, eventType, fn) {
 	containerEl.addEventListener(eventType, function(event) {
 		const el = event.target.closest(selector);
@@ -19,7 +21,7 @@ export function clamp(value, min, max) {
 
 function bindProps(el, props) {
 	for (let prop in props) {
-		if (prop === 'children') {
+		if (prop === 'children' || prop === 'tag') {
 			continue;
 		}
 		const value = props[prop];
