@@ -5,8 +5,6 @@ const BODY_RADIUS = 90;
 const BODY_CENTER = 100;
 
 function PanelCreepPreview({ bodyParts, bodyPartsText }) {
-	// <circle cx="100" cy="100" fill="rgb(34,34,34)" style="stroke-width: 0; stroke: rgb(85,85,85);" r="90"></circle>
-
 	function getArcPath(partsCount) {
 		if (partsCount === 0) {
 			return '';

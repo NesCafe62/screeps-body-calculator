@@ -4,69 +4,71 @@ import { If, StaticFor } from "../pozitron-web";
 const Boosts = {
 	Move: [
 		// yellow
-		{tier: 'T3', title: 'ZO', color: 'mineral-z'},
-		{tier: 'T2', title: 'ZHO2', color: 'mineral-z'},
-		{tier: 'T1', title: 'XZHO2', color: 'mineral-z'},
+		{tier: 'T1', title: 'ZO', tooltip: '2x Move speed', color: 'mineral-z'},
+		{tier: 'T2', title: 'ZHO2', tooltip: '3x Move speed', color: 'mineral-z'},
+		{tier: 'T3', title: 'XZHO2', tooltip: '4x Move speed', color: 'mineral-z'},
 	],
 	Work: [
 		// harvest: teal
-		{tier: 'T3', title: 'UO', color: 'mineral-u'},
-		{tier: 'T2', title: 'UHO2', color: 'mineral-u'},
-		{tier: 'T1', title: 'XUHO2', color: 'mineral-u'},
+		{tier: 'T1', title: 'UO', tooltip: '3x Harvest', color: 'mineral-u'},
+		{tier: 'T2', title: 'UHO2', tooltip: '5x Harvest', color: 'mineral-u'},
+		{tier: 'T3', title: 'XUHO2', tooltip: '7x Harvest', color: 'mineral-u'},
 
 		// upgrade: white
-		{tier: 'T3', title: 'GH', color: 'mineral-g'},
-		{tier: 'T2', title: 'GH2O', color: 'mineral-g'},
-		{tier: 'T1', title: 'XGH2O', color: 'mineral-g'},
+		{tier: 'T1', title: 'GH', tooltip: '1.5x Upgrade', color: 'mineral-g'},
+		{tier: 'T2', title: 'GH2O', tooltip: '1.8x Upgrade', color: 'mineral-g'},
+		{tier: 'T3', title: 'XGH2O', tooltip: '2x Upgrade', color: 'mineral-g'},
 
 		// build/repair: green
-		{tier: 'T3', title: 'LH', color: 'mineral-l'},
-		{tier: 'T2', title: 'LH2O', color: 'mineral-l'},
-		{tier: 'T1', title: 'XLH2O', color: 'mineral-l'},
+		{tier: 'T1', title: 'LH', tooltip: '1.5x Build/Repair', color: 'mineral-l'},
+		{tier: 'T2', title: 'LH2O', tooltip: '1.8x Build/Repair', color: 'mineral-l'},
+		{tier: 'T3', title: 'XLH2O', tooltip: '2x Build/Repair', color: 'mineral-l'},
 
 		// dismantle: yellow
-		{tier: 'T3', title: 'ZH', color: 'mineral-z'},
-		{tier: 'T2', title: 'ZH2O', color: 'mineral-z'},
-		{tier: 'T1', title: 'XZH2O', color: 'mineral-z'},
+		{tier: 'T1', title: 'ZH', tooltip: '2x Dismantle', color: 'mineral-z'},
+		{tier: 'T2', title: 'ZH2O', tooltip: '3x Dismantle', color: 'mineral-z'},
+		{tier: 'T3', title: 'XZH2O', tooltip: '4x Dismantle', color: 'mineral-z'},
 	],
 	Carry: [
 		// violet
-		{tier: 'T3', title: 'KH', color: 'mineral-k'},
-		{tier: 'T2', title: 'KH2O', color: 'mineral-k'},
-		{tier: 'T1', title: 'XKH2O', color: 'mineral-k'},
+		{tier: 'T1', title: 'KH', tooltip: '2x Capacity', color: 'mineral-k'},
+		{tier: 'T2', title: 'KH2O', tooltip: '3x Capacity', color: 'mineral-k'},
+		{tier: 'T3', title: 'XKH2O', tooltip: '4x Capacity', color: 'mineral-k'},
 	],
 	Attack: [
 		// teal
-		{tier: 'T3', title: 'UH', color: 'mineral-u'},
-		{tier: 'T2', title: 'UH2O', color: 'mineral-u'},
-		{tier: 'T1', title: 'XUH2O', color: 'mineral-u'},
+		{tier: 'T1', title: 'UH', tooltip: '2x Melee damage', color: 'mineral-u'},
+		{tier: 'T2', title: 'UH2O', tooltip: '3x Melee damage', color: 'mineral-u'},
+		{tier: 'T3', title: 'XUH2O', tooltip: '4x Melee damage', color: 'mineral-u'},
 	],
 	Ranged: [
 		// violet
-		{tier: 'T3', title: 'KO', color: 'mineral-k'},
-		{tier: 'T2', title: 'KHO2', color: 'mineral-k'},
-		{tier: 'T1', title: 'XKHO2', color: 'mineral-k'},
+		{tier: 'T1', title: 'KO', tooltip: '2x Ranged damage', color: 'mineral-k'},
+		{tier: 'T2', title: 'KHO2', tooltip: '3x Ranged damage', color: 'mineral-k'},
+		{tier: 'T3', title: 'XKHO2', tooltip: '4x Ranged damage', color: 'mineral-k'},
 	],
 	Heal: [
 		// green
-		{tier: 'T3', title: 'LO', color: 'mineral-l'},
-		{tier: 'T2', title: 'LHO2', color: 'mineral-l'},
-		{tier: 'T1', title: 'XLHO2', color: 'mineral-l'},
+		{tier: 'T1', title: 'LO', tooltip: '2x Heal', color: 'mineral-l'},
+		{tier: 'T2', title: 'LHO2', tooltip: '3x Heal', color: 'mineral-l'},
+		{tier: 'T3', title: 'XLHO2', tooltip: '4x Heal', color: 'mineral-l'},
 	],
 	Tough: [
 		// white
-		{tier: 'T3', title: 'GO', color: 'mineral-g'},
-		{tier: 'T2', title: 'GHO2', color: 'mineral-g'},
-		{tier: 'T1', title: 'XGHO2', color: 'mineral-g'},
+		{tier: 'T1', title: 'GO', tooltip: '30% Damage reduction', color: 'mineral-g'},
+		{tier: 'T2', title: 'GHO2', tooltip: '50% Damage reduction', color: 'mineral-g'},
+		{tier: 'T3', title: 'XGHO2', tooltip: '70% Damage reduction', color: 'mineral-g'},
 	],
 };
 
 const BoostColors = {};
 const BoostTiers = {};
+const BoostTolltips = {};
 for (const partType in Boosts) {
 	for (const boost of Boosts[partType]) {
 		BoostColors[boost.title] = boost.color;
 		BoostTiers[boost.title] = boost.tier;
+		BoostTolltips[boost.title] = boost.tooltip;
 	}
 }
 
@@ -132,6 +134,7 @@ function BodyPartCompose(props) {
 				() => (
 					<button
 						class="btn-body-compose-boost"
+						title={() => BoostTolltips[data.boost] || undefined}
 						onClick={handleButtonBoostClick}
 						onFocusOut={handleButtonBoostFocusOut}
 					>
@@ -145,13 +148,13 @@ function BodyPartCompose(props) {
 								'--cl-boost': () => getBoostColor(data.boost)
 							}}
 						>{() => data.boost || 'boost'}</span>
-						<div class="dropdown" ref={dropdownEl}>
+						<div class="dropdown" title="" ref={dropdownEl}>
 							<div class="dropdown-item">
 								<span style="display: inline-block;width: 20px;opacity: 0.4;">--</span>
 								<span class="dropdown-item-boost">none</span>
 							</div>
 							<StaticFor each={boosts}>{ boost => (
-								<div class="dropdown-item">
+								<div class="dropdown-item" title={boost.tooltip}>
 									<span style="display: inline-block;width: 20px;">{boost.tier}</span>
 									<span class="dropdown-item-boost">{boost.title}</span>
 								</div>

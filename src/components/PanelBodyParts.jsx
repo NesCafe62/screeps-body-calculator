@@ -112,7 +112,18 @@ function PanelBodyParts({ bodyParts, getBodyParts, stats }) {
 					<span style="font-size: 0.8rem;min-width: 45px;display: inline-block;text-align: left;">EN</span>
 				</span>
 			</div>
-			<div class="creep-metric-row" style="margin-top: 20px;" title="Move speed on road">
+			<div class="creep-metric-row" style="margin-top: 10px;">
+				<span style="display: inline-block;">
+					<i class="mdi mdi-timer-outline" style="font-size: 1.3rem;vertical-align: top;line-height: 1rem;margin-right: 8px;" />
+					<span style="display: inline-block;">Spawn time</span>
+				</span>
+				<span style="text-align: right;display: inline-block;flex-grow: 1;margin-right: -10px;">
+					<span style="font-size: 1.3rem;vertical-align: top;display: inline-block;padding-right: 8px;line-height: 1rem;">{stats.spawnTime}</span>
+					<span style="font-size: 0.8rem;min-width: 45px;display: inline-block;text-align: left;">ticks</span>
+				</span>
+			</div>
+
+			<div class="creep-metric-row" style="margin-top: 15px;" title="Move speed on road">
 				<span style="display: inline-block;">
 					<i class="mdi mdi-road-variant" style="font-size: 1.3rem;vertical-align: top;line-height: 1rem;margin-right: 8px;" />
 					<span style="display: inline-block;">Road</span>

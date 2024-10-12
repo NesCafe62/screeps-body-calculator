@@ -9,5 +9,10 @@ Built with [Pozitron](https://github.com/NesCafe62/vite-pozitron-starter) reacti
 
 ## Changelog
 
+2024-10-12 v1.1
+* Boosts fix tier names
+* Added boosts tooltips
+* Added spawn time metric
+
 2024-10-12 v1.0
 * Initial release

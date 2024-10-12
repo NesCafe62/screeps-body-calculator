@@ -11,6 +11,7 @@ const CARRY_CAPACITY = 50;
 const WORK_HARVEST_ENERGY = 2;
 // const WORK_UPGRADE_ENERGY = 1;
 const WORK_UPGRADE_PTS = 1;
+const SPAWN_TIME_PER_PART = 3;
 
 const WORK_BUILD_ENERGY = 5;
 const WORK_BUILD_PROGRESS = 5;
@@ -247,6 +248,7 @@ function AppData() {
 
 		partsCount,
 		cost,
+		spawnTime: () => partsCount() * SPAWN_TIME_PER_PART,
 		minRCL,
 		maxCost: CREEP_MAX_COST,
 		getEnergyCapacityAtRCL: (rcl) => RCL_ENERGY_CAPACITY[rcl || 8],
