@@ -107,7 +107,7 @@ const BoostsEfficiency = {
 	},
 };
 
-const REGEXP_PARSE_URL = /(M|W|CL?|A|R|H|T)(\d+)(?:\[(.*)\])?/g; // M3[ZO]W4C12
+const REGEXP_PARSE_URL = /(M|W|CL?|A|R|H|T)(\d+)(?:\[([^\]]+)\])?/g; // M3[ZO]W4C12
 
 const URL_PARAMS_PART_TYPE = {
 	'M': 'Move',
@@ -142,10 +142,10 @@ function AppData() {
 
 	function loadFromUrlParam() {
 		let urlData = window.location.search;
-		if (!urlData || urlData.charAt(0) !== '?') {
+		if (!urlData || urlData.substring(0, 6) !== '?body=') {
 			return;
 		}
-		urlData = urlData.substring(1);
+		urlData = decodeURI(urlData.substring(6));
 		const data = {};
 		const matches = urlData.matchAll(REGEXP_PARSE_URL);
 		for (const match of matches) {
@@ -355,7 +355,8 @@ function AppData() {
 				urlParam += `[${boost}]`;
 			}
 		}
-		const shareUrl = new URL(location.protocol + '//' + location.host + location.pathname + '?' + urlParam);
+		const shareUrl = new URL(location);
+		shareUrl.searchParams.set('body', urlParam);
 		history.pushState({}, '', shareUrl);
 
 		if (navigator.clipboard) {
