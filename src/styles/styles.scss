@@ -97,7 +97,37 @@ h1 {
 	margin: 0 0 0 5px;
 	font-size: 1.5rem;
 	font-weight: normal;
-	flex-grow: 1;
+}
+
+#btn-share {
+	background-color: transparent;
+	color: inherit;
+	margin-left: 30px;
+	font-size: 1rem;
+	border-radius: 9px;
+	padding: 0 12px;
+	height: 46px;
+	margin-top: 2px;
+	opacity: 0.6;
+	cursor: pointer;
+	position: relative;
+	transition: background-color 0.3s ease, opacity 0.3s ease;
+
+	.mdi {
+		font-size: 1.5rem;
+		vertical-align: top;
+		line-height: 1rem;
+		margin-right: 6px;
+	}
+
+	&:active {
+		top: 1px;
+	}
+
+	&:hover, &:focus, &:active {
+		background-color: rgba(48, 54, 68, 0.4);
+		opacity: 1;
+	}
 }
 
 main {
@@ -135,12 +165,24 @@ footer {
 }
 
 #panel-creep-preview {
-	padding: 110px 0 0;
+	// padding: 110px 0 0;
 	flex-grow: 1;
 	display: flex;
 }
 
+.body-parts-text {
+	margin-top: 20px;
+	margin-left: 15px;
+	padding: 0 15px;
+	white-space: nowrap;
+	line-height: 40px;
+	opacity: 0.8;
+	font-size: 1rem;
+	min-width: 165px;
+}
+
 .creep-preview {
+	padding-top: 110px;
 	margin-left: auto;
 	margin-right: auto;
 }

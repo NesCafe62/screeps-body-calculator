@@ -107,6 +107,30 @@ const BoostsEfficiency = {
 	},
 };
 
+const REGEXP_PARSE_URL = /(M|W|CL?|A|R|H|T)(\d+)(?:\[(.*)\])?/g; // M3[ZO]W4C12
+
+const URL_PARAMS_PART_TYPE = {
+	'M': 'Move',
+	'W': 'Work',
+	'C': 'Carry',
+	'A': 'Attack',
+	'R': 'Ranged',
+	'H': 'Heal',
+	'T': 'Tough',
+	'CL': 'Claim',
+};
+
+const URL_PARAMS_VALID_BOOSTS = {
+	Move: ['ZO', 'ZHO2', 'XZHO2'],
+	Work: ['UO', 'UHO2', 'XUHO2', 'LH', 'LH2O', 'XLH2O', 'ZH', 'ZH2O', 'XZH2O', 'GH', 'GH2O', 'XGH2O'],
+	Carry: ['KH', 'KH2O', 'XKH2O'],
+	Attack: ['UH', 'UH2O', 'XUH2O'],
+	Ranged: ['KO', 'KHO2', 'XKHO2'],
+	Heal: ['LO', 'LHO2', 'XLHO2'],
+	Tough: ['GO', 'GHO2', 'XGHO2'],
+	Claim: [],
+};
+
 function AppData() {
 
 	function bodyPartData(data = {}) {
@@ -116,7 +140,37 @@ function AppData() {
 		});
 	}
 
-	const data = JSON.parse(localStorage.getItem('bodyParts') || '{}');
+	function loadFromUrlParam() {
+		let urlData = window.location.search;
+		if (!urlData || urlData.charAt(0) !== '?') {
+			return;
+		}
+		urlData = urlData.substring(1);
+		const data = {};
+		const matches = urlData.matchAll(REGEXP_PARSE_URL);
+		for (const match of matches) {
+			let [_, part, count, boost] = match;
+			count = Number.parseInt(count, 10);
+			if (count <= 0) {
+				continue;
+			}
+			const partType = URL_PARAMS_PART_TYPE[part];
+			if (!partType) {
+				continue;
+			}
+			if (!URL_PARAMS_VALID_BOOSTS[partType].includes(boost)) {
+				boost = '';
+			}
+			data[partType] = {count, boost};
+		}
+		return data;
+	}
+
+	function loadFromLocalStorage() {
+		return JSON.parse(localStorage.getItem('bodyParts') || '{}');
+	}
+
+	const data = loadFromUrlParam() || loadFromLocalStorage();
 	const bodyParts = {
 		Move: bodyPartData(data.Move),
 		Work: bodyPartData(data.Work),
@@ -283,11 +337,52 @@ function AppData() {
 				bodyPart.boost = '';
 			}
 		});
+		history.pushState({}, '', new URL(location.protocol + '//' + location.host + location.pathname));
+	}
+
+	function handleShare() {
+		let urlParam = '';
+		for (const partType in bodyParts) {
+			const count = bodyParts[partType].count;
+			if (count === 0) {
+				continue;
+			}
+			const boost = bodyParts[partType].boost;
+			const part = (partType === 'Claim')
+				? 'CL' : partType.charAt(0).toUpperCase();
+			urlParam += part + count;
+			if (boost) {
+				urlParam += `[${boost}]`;
+			}
+		}
+		const shareUrl = new URL(location.protocol + '//' + location.host + location.pathname + '?' + urlParam);
+		history.pushState({}, '', shareUrl);
+
+		if (navigator.clipboard) {
+			navigator.clipboard.writeText(shareUrl).then(() => {
+				window.alert("Link copied");
+			});
+		} else {
+			window.prompt("Copy to clipboard: Ctrl+C, Enter", shareUrl);
+		}
+	}
+
+	function bodyPartsText() {
+		let partsText = '';
+		for (const partType in bodyParts) {
+			const count = bodyParts[partType].count;
+			if (count > 0) {
+				const part = (partType === 'Claim')
+					? 'CL' : partType.charAt(0).toUpperCase();
+				partsText += part + count + ' ';
+			}
+		}
+		return partsText;
 	}
 
 	return {
-		bodyParts, stats,
-		getBodyParts, clear,
+		bodyParts, bodyPartsText, stats,
+		getBodyParts, clear, handleShare,
 	};
 }
 
@@ -295,11 +390,13 @@ function App() {
 	document.getElementById('app').style.opacity = '';
 
 	const {
-		bodyParts, stats,
-		getBodyParts, clear,
+		bodyParts, bodyPartsText, stats,
+		getBodyParts, clear, handleShare,
 	} = AppData();
 
-	render(PanelCreepPreview, document.getElementById('panel-creep-preview'), { bodyParts });
+	document.getElementById('btn-share').addEventListener('click', handleShare);
+
+	render(PanelCreepPreview, document.getElementById('panel-creep-preview'), { bodyParts, bodyPartsText });
 
 	render(PanelBodyComposeParts, document.getElementById('panel-body-compose-parts'), {
 		bodyParts, clear

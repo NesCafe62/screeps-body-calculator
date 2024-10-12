@@ -4,7 +4,7 @@ const ANGLE_PER_SEGMENT = Math.PI / 50; // 3.6 degrees for each side
 const BODY_RADIUS = 90;
 const BODY_CENTER = 100;
 
-function PanelCreepPreview({ bodyParts }) {
+function PanelCreepPreview({ bodyParts, bodyPartsText }) {
 	// <circle cx="100" cy="100" fill="rgb(34,34,34)" style="stroke-width: 0; stroke: rgb(85,85,85);" r="90"></circle>
 
 	function getArcPath(partsCount) {
@@ -39,6 +39,9 @@ function PanelCreepPreview({ bodyParts }) {
 
 	return (
 		<div id="panel-creep-preview">
+			<div style="width: 0;">
+				<div class="body-parts-text">{bodyPartsText}</div>
+			</div>
 			<div class="creep-preview">
 				<div class="creep-preview-shadow" />
 				<div
