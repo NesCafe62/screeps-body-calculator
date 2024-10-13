@@ -1,3 +1,4 @@
+import { batch } from "pozitron-js";
 import { clamp } from "../libs/utils";
 import { If, StaticFor } from "../pozitron-web";
 
@@ -72,20 +73,29 @@ for (const partType in Boosts) {
 	}
 }
 
-function BodyPartCompose(props) {
-	const { label, data, tooltip } = props;
-	const partType = props.label.toLowerCase();
-
-	const boosts = Boosts[label];
+function BodyPartCompose({ partType, data, tooltip, bodyPartsList }) {
+	const boosts = Boosts[partType];
 
 	function increaseCount(e) {
+		if (data.count === 50) {
+			return;
+		}
 		const inc = e.shiftKey ? 5 : 1;
-		data.count = clamp(data.count + inc, 0, 50);
+		batch(() => {
+			data.count = clamp(data.count + inc, 0, 50);
+			bodyPartsList.add(partType, inc);
+		});
 	}
 
 	function decreaseCount(e) {
+		if (data.count === 0) {
+			return;
+		}
 		const inc = e.shiftKey ? 5 : 1;
-		data.count = clamp(data.count - inc, 0, 50);
+		batch(() => {
+			data.count = clamp(data.count - inc, 0, 50);
+			bodyPartsList.remove(partType, inc);
+		});
 	}
 
 	let dropdownEl;
@@ -124,7 +134,7 @@ function BodyPartCompose(props) {
 	return (
 		<div
 			class="body-compose-part"
-			style={`--cl-part: var(--cl-part-${partType})`}
+			style={`--cl-part: var(--cl-part-${partType.toLowerCase()})`}
 			classList={{
 				'part-has-boost': () => (data.boost !== ''),
 				'part-has-count': () => data.count > 0
@@ -166,7 +176,7 @@ function BodyPartCompose(props) {
 			]}</If>
 			
 			<div class="body-compose-part-title" title={tooltip}>
-				<span>{label}</span>
+				<span>{partType}</span>
 				<div class="body-compose-part-count">{() => data.count}</div>
 			</div>
 			<button
@@ -181,7 +191,7 @@ function BodyPartCompose(props) {
 	);
 }
 
-function PanelBodyComposeParts({ bodyParts, clear }) {
+function PanelBodyComposeParts({ bodyParts, bodyPartsList, clear }) {
 	return (
 		<div id="panel-body-compose-parts">
 			<div style="margin-bottom: -45px;">
@@ -190,14 +200,14 @@ function PanelBodyComposeParts({ bodyParts, clear }) {
 					onClick={clear} onMouseDown={e => e.preventDefault()}
 				>Clear</button>
 			</div>
-			<BodyPartCompose label="Move" tooltip="Move - 50 EN" data={bodyParts.Move} />
-			<BodyPartCompose label="Work" tooltip="Work - 100 EN" data={bodyParts.Work} />
-			<BodyPartCompose label="Carry" tooltip="Carry - 50 EN" data={bodyParts.Carry} />
-			<BodyPartCompose label="Attack" tooltip="Attack - 80 EN" data={bodyParts.Attack} />
-			<BodyPartCompose label="Ranged" tooltip="Ranged Attack - 150 EN" data={bodyParts.Ranged} />
-			<BodyPartCompose label="Heal" tooltip="Heal - 250 EN" data={bodyParts.Heal} />
-			<BodyPartCompose label="Tough" tooltip="Tough - 10 EN" data={bodyParts.Tough} />
-			<BodyPartCompose label="Claim" tooltip="Claim - 600 EN" data={bodyParts.Claim} />
+			<BodyPartCompose partType="Move" tooltip="Move - 50 EN" data={bodyParts.Move} bodyPartsList={bodyPartsList} />
+			<BodyPartCompose partType="Work" tooltip="Work - 100 EN" data={bodyParts.Work} bodyPartsList={bodyPartsList} />
+			<BodyPartCompose partType="Carry" tooltip="Carry - 50 EN" data={bodyParts.Carry} bodyPartsList={bodyPartsList} />
+			<BodyPartCompose partType="Attack" tooltip="Attack - 80 EN" data={bodyParts.Attack} bodyPartsList={bodyPartsList} />
+			<BodyPartCompose partType="Ranged" tooltip="Ranged Attack - 150 EN" data={bodyParts.Ranged} bodyPartsList={bodyPartsList} />
+			<BodyPartCompose partType="Heal" tooltip="Heal - 250 EN" data={bodyParts.Heal} bodyPartsList={bodyPartsList} />
+			<BodyPartCompose partType="Tough" tooltip="Tough - 10 EN" data={bodyParts.Tough} bodyPartsList={bodyPartsList} />
+			<BodyPartCompose partType="Claim" tooltip="Claim - 600 EN" data={bodyParts.Claim} bodyPartsList={bodyPartsList} />
 			<div class="body-compose-hint">
 				<span class="body-compose-hint-sign">±</span>
 				<span style="margin-right: 15px">5</span>Shift + <i class="mdi mdi-mouse" style="opacity: 0.5;" />

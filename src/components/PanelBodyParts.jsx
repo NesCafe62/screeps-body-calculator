@@ -1,19 +1,30 @@
 import { memo } from 'pozitron-js';
 import { Index } from '../pozitron-web';
 
-function BodyParts({ getBodyParts }) {
+function BodyParts({ getBodyParts, removeBodyPartAt }) {
 	function getTooltip(bodyPart) {
 		if (!bodyPart.type) {
 			return undefined;
 		}
-		return bodyPart.type + (bodyPart.boost ? ` [${bodyPart.boost}]` : '');
+		return bodyPart.type + (bodyPart.boost ? ` [${bodyPart.boost}]` : '') + '\nClick to remove';
 	}
+
+	function handleBodyPartClick(e) {
+		if (!e.target.classList.contains('body-part')) {
+			return;
+		}
+		const index = e.target.getAttribute('data-index');
+		if (index !== undefined) {
+			removeBodyPartAt(Number.parseInt(index, 10));
+		}
+	}
+
 	return (
-		<div class="body-parts">
-			<Index each={getBodyParts} key="key">{ bodyPart => (
+		<div class="body-parts" onClick={handleBodyPartClick}>
+			<Index each={getBodyParts} key="key">{ (bodyPart, index) => (
 				<div
-					class={'body-part' + (bodyPart.boost ? ' body-part-boosted' : '')}
-					style={bodyPart.type ? `background-color: var(--cl-part-${bodyPart.type.toLowerCase()});` : undefined}
+					class={'body-part' + (bodyPart.boost ? ' body-part-boosted' : '')} data-index={index}
+					style={bodyPart.type ? `background-color: var(--cl-part-${bodyPart.type.toLowerCase()});cursor: pointer;` : undefined}
 					title={getTooltip(bodyPart)}
 				/>
 			)}</Index>
@@ -21,7 +32,7 @@ function BodyParts({ getBodyParts }) {
 	);
 }
 
-function PanelBodyParts({ bodyParts, getBodyParts, stats }) {
+function PanelBodyParts({ bodyParts, getBodyParts, removeBodyPartAt, stats }) {
 	const partsCountWarning = memo(() => (
 		stats.partsCount() > 50
 			? 'Creep size exceeds the maximum of 50 parts'
@@ -85,7 +96,7 @@ function PanelBodyParts({ bodyParts, getBodyParts, stats }) {
 					<i class="mdi mdi-alert-rhombus-outline"/>{stats.partsCount} parts
 				</span>
 			</div>
-			<BodyParts getBodyParts={getBodyParts} />
+			<BodyParts getBodyParts={getBodyParts} removeBodyPartAt={removeBodyPartAt} />
 			<div class="creep-metric-row" style="margin-top: 20px;">
 				<span style="display: inline-block;color: var(--cl-part-work);">
 					<i class="mdi mdi-lightning-bolt" style="font-size: 1.3rem;vertical-align: top;line-height: 1rem;margin-right: 8px;" />

@@ -3,7 +3,7 @@ import { store } from "./pozitron-store";
 import PanelCreepPreview from "./components/PanelCreepPreview";
 import PanelBodyComposeParts from "./components/PanelBodyComposeParts";
 import PanelBodyParts from "./components/PanelBodyParts";
-import { batch, memo, subscribe } from "pozitron-js";
+import { batch, memo, subscribe, voidSignal } from "pozitron-js";
 
 const BODY_PART_HEALTH = 100;
 
@@ -134,7 +134,51 @@ const URL_PARAMS_VALID_BOOSTS = {
 
 function AppData() {
 
-	function bodyPartData(data = {}) {
+	function createBodyPartsList(initialItems = []) {
+		const [track, notify] = voidSignal();
+		let items = initialItems;
+
+		function clear() {
+			bodyPartsList.items = items = [];
+			notify();
+		}
+
+		function add(partType, count = 1) {
+			for (let i = 0; i < count; i++) {
+				items.unshift(partType);
+			}
+			notify();
+		}
+
+		function remove(partType, count = 1) {
+			let removeCount = count;
+			for (let i = 0; i < items.length; i++) {
+				if (items[i] === partType) {
+					items.splice(i, 1);
+					i--;
+					removeCount--;
+					if (removeCount === 0) {
+						break;
+					}
+				}
+			}
+			notify();
+		}
+
+		function removeAt(index) {
+			items.splice(index, 1);
+			notify();
+		}
+
+		const bodyPartsList = {
+			items,
+			getItems: () => track(items),
+			clear, add, remove, removeAt,
+		};
+		return bodyPartsList;
+	}
+
+	function createBodyPartData(data = {}) {
 		return store({
 			count: data.count || 0,
 			boost: data.boost || '',
@@ -148,6 +192,7 @@ function AppData() {
 		}
 		urlData = decodeURI(urlData.substring(6));
 		const data = {};
+		const partItems = [];
 		const matches = urlData.matchAll(REGEXP_PARSE_URL);
 		for (const match of matches) {
 			let [_, part, count, boost] = match;
@@ -162,29 +207,77 @@ function AppData() {
 			if (!URL_PARAMS_VALID_BOOSTS[partType].includes(boost)) {
 				boost = '';
 			}
-			data[partType] = {count, boost};
+			if (!data[partType]) {
+				data[partType] = { count, boost };
+			} else {
+				data[partType].count += count;
+			}
+			for (let i = 0; i < count; i++) {
+				partItems.push(partType);
+			}
 		}
-		return data;
+		return { data, partItems };
+	}
+
+	// compatibility with v1.1
+	function generatePartItems(data) {
+		const bodyPartsOrder = ['Tough', 'Work', 'Carry', 'Ranged', 'Attack', 'Heal', 'Claim', 'Move'];
+		const items = [];
+		for (const partType of bodyPartsOrder) {
+			if (!data[partType]) {
+				continue;
+			}
+			const count = data[partType].count;
+			for (let i = 0; i < count; i++) {
+				items.push(partType);
+			}
+		}
+		return items;
 	}
 
 	function loadFromLocalStorage() {
-		return JSON.parse(localStorage.getItem('bodyParts') || '{}');
+		const data = JSON.parse(localStorage.getItem('bodyParts') || 'null');
+		if (!data) {
+			return { data: {}, partItems: [] };
+		}
+		let partItems = JSON.parse(localStorage.getItem('partItems') || 'null');
+		if (!partItems) {
+			partItems = generatePartItems(data);
+		}
+		return { data, partItems };
 	}
 
-	const data = loadFromUrlParam() || loadFromLocalStorage();
+	const { data, partItems } = loadFromUrlParam() || loadFromLocalStorage();
+
+	const bodyPartsList = createBodyPartsList(partItems);
 	const bodyParts = {
-		Move: bodyPartData(data.Move),
-		Work: bodyPartData(data.Work),
-		Carry: bodyPartData(data.Carry),
-		Attack: bodyPartData(data.Attack),
-		Ranged: bodyPartData(data.Ranged),
-		Heal: bodyPartData(data.Heal),
-		Claim: bodyPartData(data.Claim),
-		Tough: bodyPartData(data.Tough),
+		Move: createBodyPartData(data.Move),
+		Work: createBodyPartData(data.Work),
+		Carry: createBodyPartData(data.Carry),
+		Attack: createBodyPartData(data.Attack),
+		Ranged: createBodyPartData(data.Ranged),
+		Heal: createBodyPartData(data.Heal),
+		Tough: createBodyPartData(data.Tough),
+		Claim: createBodyPartData(data.Claim),
 	};
 
-	subscribe(() => JSON.stringify(bodyParts), (bodyParts) => {
+	function removeBodyPartAt(index) {
+		const partType = bodyPartsList.items[index];
+		if (!partType) {
+			return;
+		}
+		batch(() => {
+			bodyParts[partType].count--;
+			bodyPartsList.removeAt(index);
+		});
+	}
+
+	subscribe([
+		() => JSON.stringify(bodyParts),
+		bodyPartsList.getItems
+	], (bodyParts, partItems) => {
 		localStorage.setItem('bodyParts', bodyParts);
+		localStorage.setItem('partItems', JSON.stringify(partItems));
 	}, {defer: true});
 
 	const partsCount = memo(() => {
@@ -309,10 +402,10 @@ function AppData() {
 		),
 	};
 
-	const bodyPartsOrder = ['Tough', 'Work', 'Carry', 'Ranged', 'Attack', 'Heal', 'Claim', 'Move'];
+	// const bodyPartsOrder = ['Tough', 'Work', 'Carry', 'Ranged', 'Attack', 'Heal', 'Claim', 'Move'];
 	const getBodyParts = memo(() => {
 		const body = [];
-		for (const partType of bodyPartsOrder) {
+		/* for (const partType of bodyPartsOrder) {
 			const partsCount = bodyParts[partType].count;
 			const boost = bodyParts[partType].boost;
 			for (let i = 0; i < partsCount; i++) {
@@ -321,6 +414,13 @@ function AppData() {
 					break;
 				}
 			}
+			if (body.length >= 50) {
+				break;
+			}
+		} */
+		for (const partType of bodyPartsList.getItems()) {
+			const boost = bodyParts[partType].boost;
+			body.push({ type: partType, boost, key: `${partType}:${boost}` });
 			if (body.length >= 50) {
 				break;
 			}
@@ -338,13 +438,38 @@ function AppData() {
 				bodyPart.count = 0;
 				bodyPart.boost = '';
 			}
+			bodyPartsList.clear();
 		});
 		history.pushState({}, '', new URL(location.protocol + '//' + location.host + location.pathname));
 	}
 
 	function handleShare() {
+		const savedBoosts = {};
+		let prevPart = bodyPartsList.items[0];
+		let count = 0;
 		let urlParam = '';
-		for (const partType in bodyParts) {
+		for (const partType of bodyPartsList.items.concat([''])) {
+			if (partType === prevPart) {
+				count++;
+			} else {
+				if (!prevPart) {
+					break;
+				}
+				const part = (prevPart === 'Claim')
+					? 'CL' : prevPart.charAt(0).toUpperCase();
+				urlParam += part + count;
+				if (!savedBoosts[prevPart]) {
+					savedBoosts[prevPart] = true;
+					const boost = bodyParts[prevPart].boost;
+					if (boost) {
+						urlParam += `[${boost}]`;
+					}
+				}
+				count = 1;
+			}
+			prevPart = partType;
+		}
+		/* for (const partType in bodyParts) {
 			const count = bodyParts[partType].count;
 			if (count === 0) {
 				continue;
@@ -356,7 +481,7 @@ function AppData() {
 			if (boost) {
 				urlParam += `[${boost}]`;
 			}
-		}
+		} */
 		const shareUrl = new URL(location);
 		shareUrl.searchParams.set('body', urlParam);
 		history.pushState({}, '', shareUrl);
@@ -371,20 +496,31 @@ function AppData() {
 	}
 
 	function bodyPartsText() {
-		let partsText = '';
-		for (const partType in bodyParts) {
+		let partsText = '', savedParts = {};
+		for (const partType of bodyPartsList.getItems()) {
+			if (savedParts[partType]) {
+				continue;
+			}
+			savedParts[partType] = true;
+			const count = bodyParts[partType].count;
+			const part = (partType === 'Claim')
+				? 'CL' : partType.charAt(0).toUpperCase();
+			partsText += part + count + ' ';
+		}
+		/* for (const partType in bodyParts) {
 			const count = bodyParts[partType].count;
 			if (count > 0) {
 				const part = (partType === 'Claim')
 					? 'CL' : partType.charAt(0).toUpperCase();
 				partsText += part + count + ' ';
 			}
-		}
+		} */
 		return partsText;
 	}
 
 	return {
-		bodyParts, bodyPartsText, stats,
+		bodyParts, bodyPartsList,
+		bodyPartsText, removeBodyPartAt, stats,
 		getBodyParts, clear, handleShare,
 	};
 }
@@ -393,7 +529,8 @@ function App() {
 	document.getElementById('app').style.opacity = '';
 
 	const {
-		bodyParts, bodyPartsText, stats,
+		bodyParts, bodyPartsText,
+		bodyPartsList, removeBodyPartAt, stats,
 		getBodyParts, clear, handleShare,
 	} = AppData();
 
@@ -402,11 +539,11 @@ function App() {
 	render(PanelCreepPreview, document.getElementById('panel-creep-preview'), { bodyParts, bodyPartsText });
 
 	render(PanelBodyComposeParts, document.getElementById('panel-body-compose-parts'), {
-		bodyParts, clear
+		bodyParts, bodyPartsList, clear
 	});
 
 	render(PanelBodyParts, document.getElementById('panel-body-parts'), {
-		bodyParts, getBodyParts, stats
+		bodyParts, getBodyParts, removeBodyPartAt, stats
 	});
 }
 

@@ -9,6 +9,11 @@ Built with [Pozitron](https://github.com/NesCafe62/vite-pozitron-starter) reacti
 
 ## Changelog
 
+2024-10-13 v1.2
+* Display body parts in the order of adding
+* Removing body parts by clicking them
+* Share url format modified to support body parts order
+
 2024-10-12 v1.1
 * Boosts fix tier names
 * Added boosts tooltips
