@@ -9,6 +9,9 @@ Built with [Pozitron](https://github.com/NesCafe62/vite-pozitron-starter) reacti
 
 ## Changelog
 
+2024-10-15
+* Fix body parts preview render sorted by parts count (to match game render)
+
 2024-10-13 v1.2
 * Display body parts in the order of adding
 * Removing body parts by clicking them
