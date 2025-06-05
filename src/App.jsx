@@ -322,7 +322,7 @@ function AppData() {
 	function health() {
 		const toughParts = bodyParts.Tough.count;
 		const boostFactor = BoostsEfficiency.Tough[bodyParts.Tough.boost];
-		return Math.round(BODY_PART_HEALTH * (partsCount() - toughParts + toughParts) / boostFactor);
+		return Math.round(BODY_PART_HEALTH * (partsCount() - toughParts + toughParts / boostFactor));
 	}
 
 	function healthByTough() {
