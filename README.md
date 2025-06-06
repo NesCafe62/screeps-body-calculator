@@ -9,6 +9,9 @@ Built with [Pozitron](https://github.com/NesCafe62/vite-pozitron-starter) reacti
 
 ## Changelog
 
+2024-06-06
+* Fix effective health calculation for boosted tough
+
 2024-10-15
 * Fix body parts preview render sorted by parts count (to match game render)
 
