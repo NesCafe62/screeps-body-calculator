@@ -430,6 +430,12 @@ function PanelBodyParts({
 					class="creep-metric-tab-content-boosts"
 					classList={{ 'creep-metric-tab-current': () => selectedTab() === 'boosts' }}
 				>
+					<div
+						class="creep-metric-group"
+						classList={{ 'creep-metric-group-visible': () => !stats.hasBoosts() }}
+					>
+						<div style="margin-top: 60px; opacity: 0.4; text-align: center;position: absolute;width: 100%;">No boosts added</div>
+					</div>
 					<StaticFor each={Object.values(bodyParts)}>{ data => {
 						let tier = '';
 						function getBoostIcon() {
