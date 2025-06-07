@@ -9,6 +9,12 @@ Built with [Pozitron](https://github.com/NesCafe62/vite-pozitron-starter) reacti
 
 ## Changelog
 
+2024-06-07 v1.3
+* Added lifetime
+* Added energy cost per tick
+* Added energy cost with boosts
+* Added boosts tab displaying amount and amount per tick
+
 2024-06-06
 * Fix effective health calculation for boosted tough
 

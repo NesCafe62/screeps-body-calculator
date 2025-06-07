@@ -2,80 +2,10 @@ import { batch } from "pozitron-js";
 import { clamp } from "../libs/utils";
 import { If, StaticFor } from "../pozitron-web";
 
-const Boosts = {
-	Move: [
-		// yellow
-		{tier: 'T1', title: 'ZO', tooltip: '2x Move speed', color: 'mineral-z'},
-		{tier: 'T2', title: 'ZHO2', tooltip: '3x Move speed', color: 'mineral-z'},
-		{tier: 'T3', title: 'XZHO2', tooltip: '4x Move speed', color: 'mineral-z'},
-	],
-	Work: [
-		// harvest: teal
-		{tier: 'T1', title: 'UO', tooltip: '3x Harvest', color: 'mineral-u'},
-		{tier: 'T2', title: 'UHO2', tooltip: '5x Harvest', color: 'mineral-u'},
-		{tier: 'T3', title: 'XUHO2', tooltip: '7x Harvest', color: 'mineral-u'},
-
-		// upgrade: white
-		{tier: 'T1', title: 'GH', tooltip: '1.5x Upgrade', color: 'mineral-g'},
-		{tier: 'T2', title: 'GH2O', tooltip: '1.8x Upgrade', color: 'mineral-g'},
-		{tier: 'T3', title: 'XGH2O', tooltip: '2x Upgrade', color: 'mineral-g'},
-
-		// build/repair: green
-		{tier: 'T1', title: 'LH', tooltip: '1.5x Build/Repair', color: 'mineral-l'},
-		{tier: 'T2', title: 'LH2O', tooltip: '1.8x Build/Repair', color: 'mineral-l'},
-		{tier: 'T3', title: 'XLH2O', tooltip: '2x Build/Repair', color: 'mineral-l'},
-
-		// dismantle: yellow
-		{tier: 'T1', title: 'ZH', tooltip: '2x Dismantle', color: 'mineral-z'},
-		{tier: 'T2', title: 'ZH2O', tooltip: '3x Dismantle', color: 'mineral-z'},
-		{tier: 'T3', title: 'XZH2O', tooltip: '4x Dismantle', color: 'mineral-z'},
-	],
-	Carry: [
-		// violet
-		{tier: 'T1', title: 'KH', tooltip: '2x Capacity', color: 'mineral-k'},
-		{tier: 'T2', title: 'KH2O', tooltip: '3x Capacity', color: 'mineral-k'},
-		{tier: 'T3', title: 'XKH2O', tooltip: '4x Capacity', color: 'mineral-k'},
-	],
-	Attack: [
-		// teal
-		{tier: 'T1', title: 'UH', tooltip: '2x Melee damage', color: 'mineral-u'},
-		{tier: 'T2', title: 'UH2O', tooltip: '3x Melee damage', color: 'mineral-u'},
-		{tier: 'T3', title: 'XUH2O', tooltip: '4x Melee damage', color: 'mineral-u'},
-	],
-	Ranged: [
-		// violet
-		{tier: 'T1', title: 'KO', tooltip: '2x Ranged damage', color: 'mineral-k'},
-		{tier: 'T2', title: 'KHO2', tooltip: '3x Ranged damage', color: 'mineral-k'},
-		{tier: 'T3', title: 'XKHO2', tooltip: '4x Ranged damage', color: 'mineral-k'},
-	],
-	Heal: [
-		// green
-		{tier: 'T1', title: 'LO', tooltip: '2x Heal', color: 'mineral-l'},
-		{tier: 'T2', title: 'LHO2', tooltip: '3x Heal', color: 'mineral-l'},
-		{tier: 'T3', title: 'XLHO2', tooltip: '4x Heal', color: 'mineral-l'},
-	],
-	Tough: [
-		// white
-		{tier: 'T1', title: 'GO', tooltip: '30% Damage reduction', color: 'mineral-g'},
-		{tier: 'T2', title: 'GHO2', tooltip: '50% Damage reduction', color: 'mineral-g'},
-		{tier: 'T3', title: 'XGHO2', tooltip: '70% Damage reduction', color: 'mineral-g'},
-	],
-};
-
-const BoostColors = {};
-const BoostTiers = {};
-const BoostTolltips = {};
-for (const partType in Boosts) {
-	for (const boost of Boosts[partType]) {
-		BoostColors[boost.title] = boost.color;
-		BoostTiers[boost.title] = boost.tier;
-		BoostTolltips[boost.title] = boost.tooltip;
-	}
-}
-
-function BodyPartCompose({ partType, data, tooltip, bodyPartsList }) {
-	const boosts = Boosts[partType];
-
+function BodyPartCompose({
+	partType, data, tooltip, bodyPartsList, boosts,
+	getBoostColor, getBoostTier, getBoostTooltip
+}) {
 	function increaseCount(e) {
 		if (data.count === 50) {
 			return;
@@ -124,13 +54,6 @@ function BodyPartCompose({ partType, data, tooltip, bodyPartsList }) {
 		}
 	}
 
-	function getBoostColor(boost) {
-		const color = BoostColors[boost];
-		if (color) {
-			return `var(--cl-${color})`;
-		}
-	}
-
 	return (
 		<div
 			class="body-compose-part"
@@ -144,12 +67,12 @@ function BodyPartCompose({ partType, data, tooltip, bodyPartsList }) {
 				() => (
 					<button
 						class="btn-body-compose-boost"
-						title={() => BoostTolltips[data.boost] || undefined}
+						title={() => getBoostTooltip(data.boost)}
 						onClick={handleButtonBoostClick}
 						onFocusOut={handleButtonBoostFocusOut}
 					>
 						<If condition={() => data.boost}>{[
-							() => <span>{() => BoostTiers[data.boost]}</span>,
+							() => <span>{() => getBoostTier(data.boost)}</span>,
 							() => <span><i class="mdi mdi-chevron-down"></i></span>
 						]}</If>
 						<span
@@ -191,7 +114,11 @@ function BodyPartCompose({ partType, data, tooltip, bodyPartsList }) {
 	);
 }
 
-function PanelBodyComposeParts({ bodyParts, bodyPartsList, clear }) {
+function PanelBodyComposeParts({
+	bodyParts, bodyPartsList, clear,
+	Boosts, getBoostColor, getBoostTier, getBoostTooltip
+}) {
+	const params = { bodyPartsList, getBoostColor, getBoostTier, getBoostTooltip };
 	return (
 		<div id="panel-body-compose-parts">
 			<div style="margin-bottom: -45px;">
@@ -200,13 +127,13 @@ function PanelBodyComposeParts({ bodyParts, bodyPartsList, clear }) {
 					onClick={clear} onMouseDown={e => e.preventDefault()}
 				>Clear</button>
 			</div>
-			<BodyPartCompose partType="Move" tooltip="Move - 50 EN" data={bodyParts.Move} bodyPartsList={bodyPartsList} />
-			<BodyPartCompose partType="Work" tooltip="Work - 100 EN" data={bodyParts.Work} bodyPartsList={bodyPartsList} />
-			<BodyPartCompose partType="Carry" tooltip="Carry - 50 EN" data={bodyParts.Carry} bodyPartsList={bodyPartsList} />
-			<BodyPartCompose partType="Attack" tooltip="Attack - 80 EN" data={bodyParts.Attack} bodyPartsList={bodyPartsList} />
-			<BodyPartCompose partType="Ranged" tooltip="Ranged Attack - 150 EN" data={bodyParts.Ranged} bodyPartsList={bodyPartsList} />
-			<BodyPartCompose partType="Heal" tooltip="Heal - 250 EN" data={bodyParts.Heal} bodyPartsList={bodyPartsList} />
-			<BodyPartCompose partType="Tough" tooltip="Tough - 10 EN" data={bodyParts.Tough} bodyPartsList={bodyPartsList} />
+			<BodyPartCompose partType="Move" boosts={Boosts['Move']} tooltip="Move - 50 EN" data={bodyParts.Move} {...params} />
+			<BodyPartCompose partType="Work" boosts={Boosts['Work']} tooltip="Work - 100 EN" data={bodyParts.Work} {...params} />
+			<BodyPartCompose partType="Carry" boosts={Boosts['Carry']} tooltip="Carry - 50 EN" data={bodyParts.Carry} {...params} />
+			<BodyPartCompose partType="Attack" boosts={Boosts['Attack']} tooltip="Attack - 80 EN" data={bodyParts.Attack} {...params} />
+			<BodyPartCompose partType="Ranged" boosts={Boosts['Ranged']} tooltip="Ranged Attack - 150 EN" data={bodyParts.Ranged} {...params} />
+			<BodyPartCompose partType="Heal" boosts={Boosts['Heal']} tooltip="Heal - 250 EN" data={bodyParts.Heal} {...params} />
+			<BodyPartCompose partType="Tough" boosts={Boosts['Tough']} tooltip="Tough - 10 EN" data={bodyParts.Tough} {...params} />
 			<BodyPartCompose partType="Claim" tooltip="Claim - 600 EN" data={bodyParts.Claim} bodyPartsList={bodyPartsList} />
 			<div class="body-compose-hint">
 				<span class="body-compose-hint-sign">±</span>

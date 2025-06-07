@@ -12,6 +12,11 @@ const WORK_HARVEST_ENERGY = 2;
 // const WORK_UPGRADE_ENERGY = 1;
 const WORK_UPGRADE_PTS = 1;
 const SPAWN_TIME_PER_PART = 3;
+const CREEP_LIFE_TIME = 1500;
+const CREEP_CLAIM_LIFE_TIME = 600;
+
+const LAB_BOOST_ENERGY = 20;
+const LAB_BOOST_MINERAL = 30;
 
 const WORK_BUILD_ENERGY = 5;
 const WORK_BUILD_PROGRESS = 5;
@@ -107,6 +112,94 @@ const BoostsEfficiency = {
 		'XGHO2': 0.3,
 	},
 };
+
+
+const Boosts = {
+	Move: [
+		// yellow
+		{tier: 'T1', title: 'ZO', tooltip: '2x Move speed', color: 'mineral-z'},
+		{tier: 'T2', title: 'ZHO2', tooltip: '3x Move speed', color: 'mineral-z'},
+		{tier: 'T3', title: 'XZHO2', tooltip: '4x Move speed', color: 'mineral-z'},
+	],
+	Work: [
+		// harvest: teal
+		{tier: 'T1', title: 'UO', tooltip: '3x Harvest', color: 'mineral-u'},
+		{tier: 'T2', title: 'UHO2', tooltip: '5x Harvest', color: 'mineral-u'},
+		{tier: 'T3', title: 'XUHO2', tooltip: '7x Harvest', color: 'mineral-u'},
+
+		// upgrade: white
+		{tier: 'T1', title: 'GH', tooltip: '1.5x Upgrade', color: 'mineral-g'},
+		{tier: 'T2', title: 'GH2O', tooltip: '1.8x Upgrade', color: 'mineral-g'},
+		{tier: 'T3', title: 'XGH2O', tooltip: '2x Upgrade', color: 'mineral-g'},
+
+		// build/repair: green
+		{tier: 'T1', title: 'LH', tooltip: '1.5x Build/Repair', color: 'mineral-l'},
+		{tier: 'T2', title: 'LH2O', tooltip: '1.8x Build/Repair', color: 'mineral-l'},
+		{tier: 'T3', title: 'XLH2O', tooltip: '2x Build/Repair', color: 'mineral-l'},
+
+		// dismantle: yellow
+		{tier: 'T1', title: 'ZH', tooltip: '2x Dismantle', color: 'mineral-z'},
+		{tier: 'T2', title: 'ZH2O', tooltip: '3x Dismantle', color: 'mineral-z'},
+		{tier: 'T3', title: 'XZH2O', tooltip: '4x Dismantle', color: 'mineral-z'},
+	],
+	Carry: [
+		// violet
+		{tier: 'T1', title: 'KH', tooltip: '2x Capacity', color: 'mineral-k'},
+		{tier: 'T2', title: 'KH2O', tooltip: '3x Capacity', color: 'mineral-k'},
+		{tier: 'T3', title: 'XKH2O', tooltip: '4x Capacity', color: 'mineral-k'},
+	],
+	Attack: [
+		// teal
+		{tier: 'T1', title: 'UH', tooltip: '2x Melee damage', color: 'mineral-u'},
+		{tier: 'T2', title: 'UH2O', tooltip: '3x Melee damage', color: 'mineral-u'},
+		{tier: 'T3', title: 'XUH2O', tooltip: '4x Melee damage', color: 'mineral-u'},
+	],
+	Ranged: [
+		// violet
+		{tier: 'T1', title: 'KO', tooltip: '2x Ranged damage', color: 'mineral-k'},
+		{tier: 'T2', title: 'KHO2', tooltip: '3x Ranged damage', color: 'mineral-k'},
+		{tier: 'T3', title: 'XKHO2', tooltip: '4x Ranged damage', color: 'mineral-k'},
+	],
+	Heal: [
+		// green
+		{tier: 'T1', title: 'LO', tooltip: '2x Heal', color: 'mineral-l'},
+		{tier: 'T2', title: 'LHO2', tooltip: '3x Heal', color: 'mineral-l'},
+		{tier: 'T3', title: 'XLHO2', tooltip: '4x Heal', color: 'mineral-l'},
+	],
+	Tough: [
+		// white
+		{tier: 'T1', title: 'GO', tooltip: '30% Damage reduction', color: 'mineral-g'},
+		{tier: 'T2', title: 'GHO2', tooltip: '50% Damage reduction', color: 'mineral-g'},
+		{tier: 'T3', title: 'XGHO2', tooltip: '70% Damage reduction', color: 'mineral-g'},
+	],
+};
+
+const BoostColors = {};
+const BoostTiers = {};
+const BoostTolltips = {};
+for (const partType in Boosts) {
+	for (const boost of Boosts[partType]) {
+		BoostColors[boost.title] = boost.color;
+		BoostTiers[boost.title] = boost.tier;
+		BoostTolltips[boost.title] = boost.tooltip;
+	}
+}
+
+function getBoostTier(boost) {
+	return BoostTiers[boost] || '';
+}
+
+function getBoostTooltip(boost) {
+	return BoostTolltips[boost] || undefined;
+}
+
+function getBoostColor(boost) {
+	const color = BoostColors[boost];
+	if (color) {
+		return `var(--cl-${color})`;
+	}
+}
+
 
 const REGEXP_PARSE_URL = /(M|W|CL?|A|R|H|T)(\d+)(?:\[([^\]]+)\])?/g; // M3[ZO]W4C12
 
@@ -280,7 +373,7 @@ function AppData() {
 		localStorage.setItem('partItems', JSON.stringify(partItems));
 	}, {defer: true});
 
-	const partsCount = memo(() => {
+	/* const partsCount = memo(() => {
 		let count = 0;
 		for (const partType in bodyParts) {
 			count += bodyParts[partType].count;
@@ -289,12 +382,56 @@ function AppData() {
 	}, {static: true});
 
 	const cost = memo(() => {
-		let count = 0;
+		let cost = 0;
 		for (const partType in bodyParts) {
-			count += BodyPartsCost[partType] * bodyParts[partType].count;
+			cost += BodyPartsCost[partType] * bodyParts[partType].count;
 		}
-		return count;
+		return cost;
 	}, {static: true});
+
+	const hasBoosts = memo(() => {
+		for (const partType in bodyParts) {
+			if (bodyParts[partType].boost) {
+				return true;
+			}
+		}
+		return false;
+	}, {static: true});
+
+	const costWithBoosts = memo(() => {
+		let cost = 0;
+		for (const partType in bodyParts) {
+			const count = bodyParts[partType].count;
+			cost += BodyPartsCost[partType] * count;
+			if (bodyParts[partType].boost) {
+				cost += LAB_BOOST_ENERGY * count;
+			}
+		}
+		return cost;
+	}, {static: true}); */
+
+	const partsData = memo(() => {
+		let partsCount = 0;
+		let cost = 0;
+		let costWithBoosts = 0;
+		let hasBoosts = false;
+		for (const partType in bodyParts) {
+			const count = bodyParts[partType].count;
+			const boost = bodyParts[partType].boost;
+			partsCount += count;
+			cost += BodyPartsCost[partType] * count;
+			costWithBoosts += (BodyPartsCost[partType] + (boost ? LAB_BOOST_ENERGY : 0)) * count;
+			if (boost) {
+				hasBoosts = true;
+			}
+		}
+		return { partsCount, cost, costWithBoosts, hasBoosts };
+	}, {static: true});
+
+	const partsCount = memo(() => partsData().partsCount, {static: true});
+	const cost = memo(() => partsData().cost, {static: true});
+	const hasBoosts = memo(() => partsData().hasBoosts, {static: true});
+	const costWithBoosts = memo(() => partsData().costWithBoosts, {static: true});
 
 	function minRCL() {
 		const creepCost = cost();
@@ -331,6 +468,12 @@ function AppData() {
 		return Math.round(BODY_PART_HEALTH * toughParts / boostFactor);
 	}
 
+	const ticksToLive = memo(() => {
+		return (bodyParts.Claim.count > 0)
+			? CREEP_CLAIM_LIFE_TIME
+			: CREEP_LIFE_TIME;
+	});
+
 	const stats = {
 		moveRoad: () => getMoveTicks(1, false),
 		moveRoadFull: () => getMoveTicks(1, true),
@@ -339,9 +482,18 @@ function AppData() {
 		moveSwamp: () => getMoveTicks(10, false),
 		moveSwampFull: () => getMoveTicks(10, true),
 
+		getBoostsAmount: (partsCount) => partsCount * LAB_BOOST_MINERAL,
+		getBoostsAmountPerTick: (partsCount)  => (
+			(partsCount * LAB_BOOST_MINERAL / ticksToLive()).toFixed(2)
+		),
+
 		partsCount,
 		cost,
+		hasBoosts,
+		costWithBoosts,
+		costPerTick: () => (costWithBoosts() / ticksToLive()).toFixed(2),
 		spawnTime: () => partsCount() * SPAWN_TIME_PER_PART,
+		ticksToLive: () => (partsCount() > 0) ? ticksToLive() : 0,
 		minRCL,
 		maxCost: CREEP_MAX_COST,
 		getEnergyCapacityAtRCL: (rcl) => RCL_ENERGY_CAPACITY[rcl || 8],
@@ -539,11 +691,13 @@ function App() {
 	render(PanelCreepPreview, document.getElementById('panel-creep-preview'), { bodyParts, bodyPartsText });
 
 	render(PanelBodyComposeParts, document.getElementById('panel-body-compose-parts'), {
-		bodyParts, bodyPartsList, clear
+		bodyParts, bodyPartsList, clear,
+		Boosts, getBoostColor, getBoostTier, getBoostTooltip
 	});
 
 	render(PanelBodyParts, document.getElementById('panel-body-parts'), {
-		bodyParts, getBodyParts, removeBodyPartAt, stats
+		bodyParts, getBodyParts, removeBodyPartAt, stats,
+		getBoostColor, getBoostTier, getBoostTooltip
 	});
 }
 
