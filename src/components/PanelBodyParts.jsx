@@ -485,10 +485,6 @@ function PanelBodyParts({
 										<i class="mdi mdi-progress-star-four-points" style="font-size: 1.3rem;vertical-align: top;line-height: 1rem;margin-right: 8px;" />
 										<span style="display: inline-block;" innerHTML={() => getBoostEffectLabel()} />
 									</span>
-									<span style="text-align: right;display: inline-block;flex-grow: 1;margin-right: -10px;">
-										<span style="font-size: 1.3rem;vertical-align: top;display: inline-block;padding-right: 8px;line-height: 1rem;" />
-										<span style="font-size: 0.8rem;min-width: 45px;display: inline-block;text-align: left;" />
-									</span>
 								</div>
 								<div class="creep-metric-row" style="margin-top: 10px;">
 									<span style="text-align: right;display: inline-block;flex-grow: 1;margin-right: -10px;" title="Resource amount per tick">
